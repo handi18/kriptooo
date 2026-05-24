@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hybrid Crypto | Secure Upload</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
 </head>
+
 <body class="dark-theme">
     <div class="container">
         <header>
@@ -14,67 +17,79 @@
             <p class="subtitle">Secure, Zero-Knowledge File Upload System</p>
         </header>
 
-        <main>
-            <section class="card setup-section">
-                <h2>1. Security Setup</h2>
-                <div class="action-row">
-                    <button id="generateKeysBtn" class="btn primary">Generate RSA Key Pair</button>
-                    <div id="keyStatus" class="status-indicator">
-                        <span class="dot"></span> No keys generated
+        <main class="dashboard-grid">
+            <div class="left-column">
+                <section class="card action-section">
+                    <div class="header-row compact">
+                        <h2>1. Security Setup</h2>
+                        <div id="keyStatus" class="status-indicator">
+                            <span class="dot"></span> Not ready
+                        </div>
                     </div>
-                </div>
-                <div id="keyInfo" class="hidden">
-                    <p class="info-text">Public Key stored in memory. Private Key can be downloaded later.</p>
-                </div>
-            </section>
+                    <div class="action-row" style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+                        <button id="generateKeysBtn" class="btn primary small">Generate New</button>
+                        <span style="font-size: 0.9em; color: var(--text-muted);">or</span>
+                        <input type="file" id="importKeyInput" accept=".json" hidden>
+                        <button id="importKeyBtn" class="btn outline small" onclick="document.getElementById('importKeyInput').click()">Import Keys</button>
+                        <button id="exportKeyBtn" class="btn outline small hidden">Export Keys</button>
+                    </div>
+                </section>
 
-            <section class="card upload-section">
-                <h2>2. Encrypt & Upload</h2>
-                <div class="upload-box" id="dropZone">
-                    <input type="file" id="fileInput" hidden>
-                    <label for="fileInput" class="upload-label">
-                        <span class="icon">📁</span>
-                        <strong>Choose a file</strong> or drag it here
-                    </label>
-                </div>
-                <div id="filePreview" class="hidden">
-                    <p>Selected: <span id="fileName"></span></p>
-                    <button id="encryptBtn" class="btn success" disabled>Encrypt & Upload to Flask</button>
-                </div>
-            </section>
+                <section class="card upload-section">
+                    <h2>2. Encrypt & Upload</h2>
+                    <div class="upload-box compact-upload" id="dropZone">
+                        <input type="file" id="fileInput" hidden>
+                        <label for="fileInput" class="upload-label">
+                            <span class="icon">📁</span>
+                            <strong>Choose file</strong>
+                        </label>
+                    </div>
+                    <div id="filePreview" class="hidden compact-preview">
+                        <p><span id="fileName"></span></p>
+                        <button id="encryptBtn" class="btn success small" disabled>Encrypt & Upload</button>
+                    </div>
+                </section>
 
-            <section class="card explorer-section">
-                <div class="header-row">
-                    <h2>Server Data Explorer <span class="badge">0.5.1</span></h2>
-                    <button id="refreshBtn" class="btn outline">Refresh Server Data</button>
-                </div>
-                <div class="explorer-table-wrapper">
-                    <table id="serverTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Filename</th>
-                                <th>Ciphertext (Base64)</th>
-                                <th>Auth Tag</th>
-                                <th>Timestamp</th>
-                            </tr>
-                        </thead>
-                        <tbody id="serverTableBody">
-                            <tr>
-                                <td colspan="5" class="empty-state">No data loaded.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                <section class="card log-section">
+                    <h2>Process Logs</h2>
+                    <div id="logConsole" class="console compact-console">
+                        <div class="log-entry system">System initialized. Waiting for keys...</div>
+                    </div>
+                </section>
+            </div>
 
-            <section class="card log-section">
-                <h2>Process Logs (Fase 1)</h2>
-                <div id="logConsole" class="console">
-                    <div class="log-entry system">System initialized. Waiting for keys...</div>
-                </div>
-            </section>
+            <div class="right-column">
+                <section class="card explorer-section full-height">
+                    <div class="header-row">
+                        <h2>Server Data Explorer <span class="badge">0.5.1</span></h2>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="clearAllBtn" class="btn outline small" style="color: #ff4d4d; border-color: #ff4d4d;">Clear All</button>
+                            <button id="refreshBtn" class="btn outline small">Refresh</button>
+                        </div>
+                    </div>
+                    <div class="explorer-table-wrapper">
+                        <table id="serverTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Filename</th>
+                                    <th>Ciphertext</th>
+                                    <th>Auth Tag</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="serverTableBody">
+                                <tr>
+                                    <td colspan="6" class="empty-state">No data loaded.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
         </main>
+
 
         <footer>
             <p>Built with Web Crypto API & Flask</p>
@@ -83,4 +98,5 @@
 
     <script src="crypto.js"></script>
 </body>
+
 </html>

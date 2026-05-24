@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
@@ -15,8 +16,13 @@ def init_storage():
             json.dump([], f)
 
 def get_storage():
-    with open(STORAGE_FILE, 'r') as f:
-        return json.load(f)
+    try:
+        with open(STORAGE_FILE, 'r') as f:
+            content = f.read()
+            if not content.strip(): return []
+            return json.loads(content)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
 
 def save_storage(data):
     with open(STORAGE_FILE, 'w') as f:
@@ -49,6 +55,24 @@ def upload():
 def list_files():
     storage = get_storage()
     return jsonify(storage)
+
+@app.route('/files/<int:file_id>', methods=['DELETE'])
+def delete_file(file_id):
+    try:
+        storage = get_storage()
+        storage = [entry for entry in storage if entry.get("id") != file_id]
+        save_storage(storage)
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/files', methods=['DELETE'])
+def clear_files():
+    try:
+        save_storage([])
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/')
 def index():
