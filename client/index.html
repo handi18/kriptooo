@@ -17,54 +17,133 @@
             <p class="subtitle">Secure, Zero-Knowledge File Upload System</p>
         </header>
 
-        <main class="dashboard-grid">
-            <div class="left-column">
-                <section class="card action-section">
-                    <div class="header-row compact">
-                        <h2>1. Security Setup</h2>
-                        <div id="keyStatus" class="status-indicator">
-                            <span class="dot"></span> Not ready
-                        </div>
-                    </div>
-                    <div class="action-row" style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
-                        <button id="generateKeysBtn" class="btn primary small">Generate New</button>
-                        <span style="font-size: 0.9em; color: var(--text-muted);">or</span>
-                        <input type="file" id="importKeyInput" accept=".json" hidden>
-                        <button id="importKeyBtn" class="btn outline small" onclick="document.getElementById('importKeyInput').click()">Import Keys</button>
-                        <button id="exportKeyBtn" class="btn outline small hidden">Export Keys</button>
-                    </div>
-                </section>
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="switchPage(1)">Halaman 1: Unggah Data</button>
+            <button class="tab-btn" onclick="switchPage(2)">Halaman 2: File Saya (Klien)</button>
+            <button class="tab-btn" onclick="switchPage(3)">Halaman 3: Monitor Server</button>
+            <button class="tab-btn" onclick="switchPage(4)">Halaman 4: Testing & Evaluasi</button>
+        </nav>
 
-                <section class="card upload-section">
-                    <h2>2. Encrypt & Upload</h2>
-                    <div class="upload-box compact-upload" id="dropZone">
-                        <input type="file" id="fileInput" hidden>
-                        <label for="fileInput" class="upload-label">
-                            <span class="icon">📁</span>
-                            <strong>Choose file</strong>
-                        </label>
-                    </div>
-                    <div id="filePreview" class="hidden compact-preview">
-                        <p><span id="fileName"></span></p>
-                        <button id="encryptBtn" class="btn success small" disabled>Encrypt & Upload</button>
-                    </div>
-                </section>
+        <main>
+            <!-- PAGE 1: Upload -->
+            <div id="page-1" class="page active">
+                <div class="dashboard-grid">
+                    <div class="left-column">
+                        <section class="card action-section">
+                            <div class="header-row compact">
+                                <h2>Pengaturan Keamanan</h2>
+                                <div id="keyStatus" class="status-indicator">
+                                    <span class="dot"></span> Belum siap
+                                </div>
+                            </div>
+                            <div class="action-row"
+                                style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+                                <button id="generateKeysBtn" class="btn primary small">Generate Sesi Baru</button>
+                                <span style="font-size: 0.9em; color: var(--text-muted);">atau</span>
+                                <input type="file" id="importKeyInput" accept=".json" hidden>
+                                <button id="importKeyBtn" class="btn outline small"
+                                    onclick="document.getElementById('importKeyInput').click()">Impor Kunci</button>
 
-                <section class="card log-section">
-                    <h2>Process Logs</h2>
-                    <div id="logConsole" class="console compact-console">
-                        <div class="log-entry system">System initialized. Waiting for keys...</div>
+                                <div style="width: 1px; height: 20px; background: var(--border-color); margin: 0 10px;">
+                                </div>
+
+                                <button id="exportKeyBtn" class="btn outline small hidden"
+                                    title="Backup your Private & Public Key">Cadangkan Kunci</button>
+                                <button id="exportPubKeyBtn" class="btn outline small hidden"
+                                    style="color: var(--success-color); border-color: var(--success-color);"
+                                    title="Share this with others so they can send you files">Bagikan Kunci
+                                    Publik</button>
+                            </div>
+                        </section>
+
+                        <section class="card recipient-section">
+                            <div class="header-row compact">
+                                <h2>Pilih Penerima</h2>
+                                <div id="recipientStatus" class="status-indicator">
+                                    <span class="dot active"
+                                        style="background-color: var(--accent-color); box-shadow: none;"></span> Diri
+                                    Sendiri
+                                </div>
+                            </div>
+                            <p style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 10px;">Pilih
+                                penerima dari Direktori untuk mengenkripsi file khusus untuk mereka. Kosongkan untuk
+                                enkripsi diri sendiri.</p>
+                            <div class="action-row" style="display: flex; align-items: center; gap: 10px;">
+                                <select id="recipientSelect" class="btn outline"
+                                    style="flex-grow: 1; text-align: left; padding: 6px 10px; background: var(--card-bg); color: var(--text-primary);">
+                                    <option value="">-- Enkripsi untuk Diri Sendiri --</option>
+                                </select>
+                                <button id="refreshRecipientsBtn" class="btn outline small"
+                                    title="Segarkan Daftar">↻</button>
+                                <button id="resetRecipientsBtn" class="btn outline small"
+                                    style="color: #ff4d4d; border-color: #ff4d4d;"
+                                    title="Hapus Semua Daftar">Reset</button>
+                            </div>
+                        </section>
+
+                        <section class="card upload-section">
+                            <h2>Enkripsi & Unggah</h2>
+                            <div class="upload-box compact-upload" id="dropZone">
+                                <input type="file" id="fileInput" hidden>
+                                <label for="fileInput" class="upload-label">
+                                    <span class="icon">📁</span>
+                                    <strong>Pilih file</strong>
+                                </label>
+                            </div>
+                            <div id="filePreview" class="hidden compact-preview">
+                                <p><span id="fileName"></span></p>
+                                <button id="encryptBtn" class="btn success small" disabled>Enkripsi & Unggah</button>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="right-column">
+                        <section class="card log-section full-height">
+                            <h2>Log Proses</h2>
+                            <div id="logConsole" class="console compact-console full-height">
+                                <div class="log-entry system">Sistem diinisialisasi. Menunggu kunci...</div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 2: Client Download -->
+            <div id="page-2" class="page">
+                <section class="card explorer-section full-height">
+                    <div class="header-row">
+                        <h2>File Saya <span class="badge">Tampilan Klien</span></h2>
+                        <button class="btn outline small" onclick="fetchServerData()">Segarkan</button>
+                    </div>
+                    <div class="explorer-table-wrapper">
+                        <table id="clientTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama File</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientTableBody">
+                                <tr>
+                                    <td colspan="4" class="empty-state">Tidak ada data.</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </div>
 
-            <div class="right-column">
+            <!-- PAGE 3: Server Admin -->
+            <div id="page-3" class="page">
                 <section class="card explorer-section full-height">
                     <div class="header-row">
-                        <h2>Server Data Explorer <span class="badge">0.5.1</span></h2>
+                        <h2>Eksplorer Data Server <span class="badge">Penyimpanan Mentah</span></h2>
                         <div style="display: flex; gap: 8px;">
-                            <button id="clearAllBtn" class="btn outline small" style="color: #ff4d4d; border-color: #ff4d4d;">Clear All</button>
-                            <button id="refreshBtn" class="btn outline small">Refresh</button>
+                            <button id="clearAllBtn" class="btn outline small"
+                                style="color: #ff4d4d; border-color: #ff4d4d;">Hapus Semua</button>
+                            <button class="btn outline small" onclick="fetchServerData()">Segarkan</button>
                         </div>
                     </div>
                     <div class="explorer-table-wrapper">
@@ -72,21 +151,84 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Filename</th>
-                                    <th>Ciphertext</th>
-                                    <th>Auth Tag</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
+                                    <th>Nama File</th>
+                                    <th>Teks Sandi</th>
+                                    <th>Tag Autentikasi</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="serverTableBody">
                                 <tr>
-                                    <td colspan="6" class="empty-state">No data loaded.</td>
+                                    <td colspan="6" class="empty-state">Tidak ada data.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </section>
+            </div>
+
+            <!-- PAGE 4: Testing -->
+            <div id="page-4" class="page">
+                <div
+                    style="background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="flex: 1;">
+                        <h3 style="margin-bottom: 5px; color: var(--accent-color);">Global Testing Context</h3>
+                        <p style="font-size: 0.9em; color: var(--text-secondary);">Semua pengujian di bawah ini
+                            menggunakan <strong>File Asli</strong> dan <strong>Kunci RSA</strong> yang sedang Anda
+                            siapkan di Halaman 1. Pastikan Anda sudah melengkapi Halaman 1 sebelum menekan tombol tes.
+                        </p>
+                    </div>
+                    <button id="btnDownloadEval" class="btn success small" style="white-space: nowrap;">Unduh Laporan
+                        TXT</button>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Avalanche & Tampering -->
+                    <div class="left-column">
+                        <section class="card">
+                            <h2>Uji Avalanche Effect (AES-GCM)</h2>
+                            <p style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 10px;">Sistem akan
+                                menggandakan file Anda, memodifikasi tepat 1 bit, lalu menghitung perubahan
+                                ciphertext-nya.</p>
+                            <button id="btnAvalanche" class="btn primary small">Jalankan Tes Avalanche</button>
+                            <pre id="outAvalanche" class="console compact-console"
+                                style="margin-top:10px; height: 350px; overflow-y: auto; font-size: 0.8em;"></pre>
+                        </section>
+
+                        <section class="card" style="margin-top: 20px;">
+                            <h2>Uji Integritas (Tampering Test)</h2>
+                            <p style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 10px;">Sistem
+                                mengenkripsi file Anda, diam-diam memodifikasi 1 byte ciphertext, lalu mencoba
+                                membukanya.</p>
+                            <button id="btnTamper" class="btn primary small">Jalankan Tes Integritas</button>
+                            <pre id="outTamper" class="console compact-console"
+                                style="margin-top:10px; height: 350px; overflow-y: auto; font-size: 0.8em;"></pre>
+                        </section>
+                    </div>
+
+                    <!-- OAEP & Performance -->
+                    <div class="right-column">
+                        <section class="card">
+                            <h2>Sifat Probabilistik (RSA-OAEP)</h2>
+                            <p style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 10px;">Kunci AES
+                                acak akan dibuat, lalu dibungkus 5 kali dengan Kunci RSA Publik milik Anda dari Halaman
+                                1.</p>
+                            <button id="btnOaep" class="btn primary small">Jalankan Tes Probabilistik</button>
+                            <pre id="outOaep" class="console compact-console"
+                                style="margin-top:10px; height: 350px; overflow-y: auto; font-size: 0.8em;"></pre>
+                        </section>
+
+                        <section class="card" style="margin-top: 20px;">
+                            <h2>Kinerja Waktu Komputasi</h2>
+                            <p style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 10px;">Ukur waktu
+                                enkripsi AES & RSA (ms) berdasarkan ukuran file asli yang Anda unggah.</p>
+                            <button id="btnPerf" class="btn primary small">Jalankan Benchmark</button>
+                            <pre id="outPerf" class="console compact-console"
+                                style="margin-top:10px; height: 350px; overflow-y: auto; font-size: 0.8em;"></pre>
+                        </section>
+                    </div>
+                </div>
             </div>
         </main>
 

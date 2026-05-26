@@ -329,3 +329,41 @@ tr:hover td {
     color: var(--text-secondary);
     padding: 40px;
 }
+
+/* Tab Navigation */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.tab-btn:hover:not(.active) {
+    background: rgba(88, 166, 255, 0.1);
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}

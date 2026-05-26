@@ -9,6 +9,7 @@ app = Flask(__name__, static_folder='../client', static_url_path='')
 CORS(app)
 
 STORAGE_FILE = 'storage.json'
+KEYS_FILE = 'keys.json'
 
 def init_storage():
     if not os.path.exists(STORAGE_FILE):
@@ -26,6 +27,19 @@ def get_storage():
 
 def save_storage(data):
     with open(STORAGE_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+
+def get_keys():
+    if not os.path.exists(KEYS_FILE):
+        return {}
+    with open(KEYS_FILE, 'r') as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return {}
+
+def save_keys(data):
+    with open(KEYS_FILE, 'w') as f:
         json.dump(data, f, indent=4)
 
 @app.route('/upload', methods=['POST'])
@@ -56,6 +70,21 @@ def list_files():
     storage = get_storage()
     return jsonify(storage)
 
+@app.route('/files/<int:file_id>', methods=['PUT'])
+def update_file(file_id):
+    try:
+        data = request.json
+        storage = get_storage()
+        for entry in storage:
+            if entry.get("id") == file_id:
+                if "encrypted_aes_key" in data:
+                    entry["encrypted_aes_key"] = data["encrypted_aes_key"]
+                break
+        save_storage(storage)
+        return jsonify({"status": "success", "message": "Key updated successfully!"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @app.route('/files/<int:file_id>', methods=['DELETE'])
 def delete_file(file_id):
     try:
@@ -67,10 +96,40 @@ def delete_file(file_id):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/files', methods=['DELETE'])
-def clear_files():
+def clear_all_files():
     try:
         save_storage([])
-        return jsonify({"status": "success"}), 200
+        return jsonify({"status": "success", "message": "All data cleared from server"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/keys', methods=['GET'])
+def get_all_keys():
+    keys = get_keys()
+    result = [{"username": k, "public_key": v} for k, v in keys.items()]
+    return jsonify(result)
+
+@app.route('/keys', methods=['POST'])
+def add_key():
+    try:
+        data = request.json
+        username = data.get('username')
+        public_key = data.get('public_key')
+        if not username or not public_key:
+            return jsonify({"status": "error", "message": "Missing username or public_key"}), 400
+        
+        keys = get_keys()
+        keys[username] = public_key
+        save_keys(keys)
+        return jsonify({"status": "success", "message": f"Key for {username} saved!"}), 201
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/keys', methods=['DELETE'])
+def clear_all_keys():
+    try:
+        save_keys({})
+        return jsonify({"status": "success", "message": "All keys cleared from server"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
