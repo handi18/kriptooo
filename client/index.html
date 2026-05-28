@@ -113,7 +113,6 @@
                 <section class="card explorer-section full-height">
                     <div class="header-row">
                         <h2>File Saya <span class="badge">Tampilan Klien</span></h2>
-                        <button class="btn outline small" onclick="fetchServerData()">Segarkan</button>
                     </div>
                     <div class="explorer-table-wrapper">
                         <table id="clientTable">
@@ -143,7 +142,6 @@
                         <div style="display: flex; gap: 8px;">
                             <button id="clearAllBtn" class="btn outline small"
                                 style="color: #ff4d4d; border-color: #ff4d4d;">Hapus Semua</button>
-                            <button class="btn outline small" onclick="fetchServerData()">Segarkan</button>
                         </div>
                     </div>
                     <div class="explorer-table-wrapper">
@@ -238,7 +236,10 @@
         </footer>
     </div>
 
+    <script src="UI-aja.js"></script>
     <script src="crypto.js"></script>
+    <script src="API.js"></script>
+    <script src="evaluation.js"></script>
 </body>
 
 </html>
