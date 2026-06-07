@@ -1,0 +1,17 @@
+# Runtime data server — berubah setiap sesi
+keys.json
+storage.json
+
+# Folder file uji coba (terlalu besar untuk repo)
+folder bahan testing/
+
+# CodeGraph local database
+.codegraph/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# VS Code (opsional)
+.vscode/
